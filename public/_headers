@@ -1,0 +1,24 @@
+# Cloudflare Pages HTTP headers
+# Applied to every response from the site.
+
+/*
+  # Prevent clickjacking
+  X-Frame-Options: DENY
+  # Prevent MIME-type sniffing
+  X-Content-Type-Options: nosniff
+  # Basic XSS protection (legacy browsers)
+  X-XSS-Protection: 1; mode=block
+  # Control referrer information
+  Referrer-Policy: strict-origin-when-cross-origin
+  # Restrict browser feature APIs
+  Permissions-Policy: camera=(), microphone=(), geolocation=(self)
+
+# Vite-hashed static assets — cache forever (hash changes on every build)
+/assets/*
+  Cache-Control: public, max-age=31536000, immutable
+
+# 3D models and moment images — cache 30 days
+/3d/*
+  Cache-Control: public, max-age=2592000
+/moments/*
+  Cache-Control: public, max-age=2592000

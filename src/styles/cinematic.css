@@ -1,0 +1,2108 @@
+/* ═══════════════════════════════════════════════════════════════════
+   ALAM AL MAARIFA — CINEMATIC DESIGN SYSTEM v2.0
+   Single consolidated source of truth.
+   Supersedes website/style.css (now deprecated).
+   Phase 1 Architecture Fix — June 2026
+   ═══════════════════════════════════════════════════════════════════ */
+
+/* ─────────────────────────────────────────────────────────────────
+   1. DESIGN TOKENS — CSS CUSTOM PROPERTIES
+   ───────────────────────────────────────────────────────────────── */
+:root {
+    /* ── Brand Palette ── */
+    --void: #080e1c;
+    --deep-navy: #0d2347;
+    --navy: #1b3a6b;
+    --gold: #c5a028;
+    --bronze: #8c7434;
+    --red: #a01830;
+    --cream: #faf8f4;
+    --wa: #25d366;
+
+    /* ── Spacing Scale (8pt grid) ── */
+    --space-xs: 0.5rem;
+    --space-sm: 1rem;
+    --space-md: 2rem;
+    --space-lg: 4rem;
+    --space-xl: 7rem;
+    --space-2xl: 10rem;
+
+    /* ── Typography ── */
+    --font-serif: "Playfair Display", Georgia, serif;
+    --font-sans: "Inter", system-ui, sans-serif;
+    --font-arabic: "Noto Naskh Arabic", serif;
+
+    /* ── Motion Easing ── */
+    --ease-cinematic: cubic-bezier(0.22, 1, 0.36, 1);
+    --ease-snap: cubic-bezier(0.68, -0.55, 0.265, 1.55);
+    --ease-out: cubic-bezier(0.16, 1, 0.3, 1);
+
+    /* ── Z-Index Scale — Single source of truth ──
+     Rule: never write a raw z-index integer outside this block.
+     ┌─────────────────────────────────────────┐
+     │  2   eagle canvas   (below all content) │
+     │  4   site-main      (above eagle)       │
+     │  50  sticky WA pill                     │
+     │  90  mobile menu                        │
+     │  100 navigation bar                     │
+     │  200 lead form modal                    │
+     │  300 preloader screen                   │
+     │  400 custom cursor  (always on top)     │
+     └─────────────────────────────────────────┘ */
+    --z-eagle: 2;
+    --z-main: 4;
+    --z-sticky: 50;
+    --z-menu: 90;
+    --z-nav: 100;
+    --z-modal: 200;
+    --z-preloader: 300;
+    --z-cursor: 400;
+}
+
+/* ─────────────────────────────────────────────────────────────────
+   2. BASE RESET
+   ───────────────────────────────────────────────────────────────── */
+*,
+*::before,
+*::after {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+/* Hide system cursor on fine-pointer devices — replaced by CustomCursor */
+@media (pointer: fine) {
+    * {
+        cursor: none !important;
+    }
+}
+
+html {
+    scroll-behavior: smooth;
+}
+
+body {
+    background-color: var(--void);
+    color: var(--cream);
+    font-family: var(--font-sans);
+    overflow-x: hidden;
+    line-height: 1.65;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+}
+
+/* ─────────────────────────────────────────────────────────────────
+   3. TYPOGRAPHY SYSTEM
+   ───────────────────────────────────────────────────────────────── */
+h1,
+h2,
+h3 {
+    font-family: var(--font-serif);
+    line-height: 1.1;
+}
+
+h2 {
+    font-size: clamp(1.8rem, 3.5vw, 3rem);
+    margin-bottom: 1rem;
+}
+h3 {
+    font-size: clamp(1.2rem, 2.5vw, 1.8rem);
+}
+
+/* Animated gold shimmer — used on section titles */
+.gold-gradient-text {
+    background: linear-gradient(
+        135deg,
+        var(--bronze) 0%,
+        var(--gold) 30%,
+        #f0d875 52%,
+        var(--gold) 72%,
+        var(--bronze) 100%
+    );
+    background-size: 250% auto;
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+    animation: goldShimmer 5s linear infinite;
+}
+
+.arabic-name {
+    font-family: var(--font-arabic);
+    font-size: clamp(1.4rem, 3vw, 2rem);
+    color: rgba(197, 160, 40, 0.85);
+    direction: rtl;
+    margin: 1rem 0;
+    font-weight: 600;
+}
+
+.tagline-italic {
+    font-family: var(--font-serif);
+    font-style: italic;
+    font-size: clamp(1.1rem, 1.8vw, 1.4rem);
+    color: rgba(250, 248, 244, 0.8);
+    letter-spacing: 0.05em;
+}
+
+/* ── Eyebrow label ── */
+.tag {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.75rem;
+    font-size: 0.7rem;
+    letter-spacing: 0.24em;
+    text-transform: uppercase;
+    font-weight: 600;
+    color: var(--bronze);
+    margin-bottom: 1.25rem;
+}
+
+.tag::before {
+    content: "";
+    display: block;
+    width: 24px;
+    height: 1px;
+    background-color: var(--gold);
+}
+
+.tag.center::before,
+.tag.center::after {
+    content: "";
+    display: block;
+    width: 40px;
+    height: 1px;
+    background-color: var(--gold);
+}
+
+.tag--light {
+    color: var(--gold);
+}
+
+/* ── Body text ── */
+.body-text {
+    font-size: 1rem;
+    color: rgba(250, 248, 244, 0.85);
+    margin-bottom: 1rem;
+}
+
+/* Support both .body-text--dim (BEM) and .body-text.dim (legacy) */
+.body-text--dim,
+.body-text.dim {
+    color: rgba(250, 248, 244, 0.6);
+}
+
+.body-text.center {
+    text-align: center;
+}
+
+/* ─────────────────────────────────────────────────────────────────
+   4. LAYOUT PRIMITIVES
+   ───────────────────────────────────────────────────────────────── */
+.container {
+    max-width: 1280px;
+    margin: 0 auto;
+    padding: 0 clamp(1rem, 3vw, 2rem);
+    position: relative;
+    /* No z-index here — sections use isolation: isolate to self-contain stacking */
+}
+
+/* Section base — isolation: isolate creates an independent stacking context
+   per section, preventing z-index bleed between siblings.               */
+.section {
+    position: relative;
+    overflow: hidden;
+    isolation: isolate;
+}
+
+/* Parallax background — z:0 within each isolated section */
+.bg-parallax {
+    position: absolute;
+    top: -15%;
+    left: -5%;
+    right: -5%;
+    bottom: -15%;
+    background-size: cover;
+    background-position: center;
+    will-change: transform;
+    z-index: 0;
+}
+
+/* ─────────────────────────────────────────────────────────────────
+   5. GLOBAL UI COMPONENTS
+   ───────────────────────────────────────────────────────────────── */
+
+/* ── Film grain overlay ── */
+.grain-overlay {
+    position: fixed;
+    inset: 0;
+    pointer-events: none;
+    z-index: var(
+        --z-cursor
+    ); /* Sits above everything as a pure texture layer */
+    opacity: 0.028;
+    background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.65' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)'/%3E%3C/svg%3E");
+}
+
+/* ── Scroll progress bar ── */
+.scroll-progress {
+    position: fixed;
+    top: 0;
+    left: 0;
+    height: 2px;
+    background: linear-gradient(to right, var(--bronze), var(--gold), #f0d875);
+    width: 0%;
+    z-index: var(--z-cursor);
+    box-shadow: 0 0 8px rgba(197, 160, 40, 0.8);
+    transition: width 0.1s;
+    pointer-events: none;
+}
+
+/* ── Gold rule divider ── */
+.gold-rule {
+    height: 1px;
+    background: linear-gradient(
+        to right,
+        transparent,
+        var(--gold),
+        transparent
+    );
+    margin: 1.5rem 0;
+    opacity: 0.5;
+}
+
+/* ── Buttons ── */
+.btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.5rem;
+    padding: 0.75rem 1.5rem;
+    border-radius: 4px;
+    font-size: 0.85rem;
+    font-weight: 500;
+    text-decoration: none;
+    transition: all 0.35s var(--ease-cinematic);
+    cursor: pointer;
+    font-family: var(--font-sans);
+    border: none;
+}
+
+.btn-red {
+    background-color: var(--red);
+    color: var(--cream);
+    box-shadow: 0 4px 16px rgba(160, 24, 48, 0.3);
+}
+
+@media (hover: hover) {
+    .btn-red:hover {
+        filter: brightness(1.1);
+        transform: translateY(-2px);
+        box-shadow: 0 6px 20px rgba(160, 24, 48, 0.4);
+    }
+}
+
+.btn-outline {
+    background: transparent;
+    border: 1px solid rgba(250, 248, 244, 0.3);
+    color: var(--cream);
+}
+
+@media (hover: hover) {
+    .btn-outline:hover {
+        background: rgba(250, 248, 244, 0.08);
+        border-color: rgba(197, 160, 40, 0.4);
+        color: var(--gold);
+    }
+}
+
+.card-3d {
+    transition:
+        transform 0.45s cubic-bezier(0.25, 0.8, 0.25, 1),
+        box-shadow 0.45s ease;
+    will-change: transform;
+}
+
+@media (hover: hover) {
+    .card-3d:hover {
+        transform: translateY(-10px) scale(1.015);
+        box-shadow:
+            0 32px 80px rgba(0, 0, 0, 0.5),
+            0 0 0 1px rgba(197, 160, 40, 0.35);
+    }
+}
+
+/* ─────────────────────────────────────────────────────────────────
+   6. 3D CANVAS & MOROCCAN TEXTURE
+   ───────────────────────────────────────────────────────────────── */
+
+/* Eagle canvas — fixed atmospheric layer BELOW all page content.
+   z-index: 2 puts it behind .site-main at z-index: 4             */
+.eagle-canvas-wrap {
+    position: fixed;
+    top: 0;
+    right: 0;
+    width: min(50vw, 700px);
+    height: 100vh;
+    z-index: var(--z-eagle);
+    pointer-events: none;
+}
+
+.eagle-canvas-wrap canvas {
+    width: 100% !important;
+    height: 100% !important;
+}
+
+/* Site-main lifts all content sections ABOVE the eagle */
+.site-main {
+    position: relative;
+    z-index: var(--z-main);
+}
+
+/* Moroccan geometric SVG tile — cultural depth at 4% opacity */
+.moroccan-bg {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    opacity: 0.04;
+    pointer-events: none;
+    z-index: 0;
+}
+
+/* ─────────────────────────────────────────────────────────────────
+   7. NAVIGATION
+   ───────────────────────────────────────────────────────────────── */
+.nav {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    z-index: var(--z-nav);
+    transition: all 0.4s var(--ease-cinematic);
+    border-bottom: 1px solid transparent;
+}
+
+.nav--scrolled {
+    background-color: rgba(13, 35, 71, 0.96);
+    backdrop-filter: blur(20px);
+    -webkit-backdrop-filter: blur(20px);
+    border-bottom-color: rgba(197, 160, 40, 0.15);
+}
+
+.nav__inner {
+    max-width: 1280px;
+    margin: 0 auto;
+    padding: 0 clamp(1rem, 3vw, 2rem);
+    height: 76px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 1rem;
+}
+
+.nav__links {
+    display: flex;
+    gap: clamp(1rem, 2vw, 2rem);
+}
+
+.nav__link {
+    background: none;
+    border: none;
+    color: rgba(250, 248, 244, 0.7);
+    font-size: 0.85rem;
+    font-weight: 500;
+    cursor: pointer;
+    font-family: var(--font-sans);
+    position: relative;
+    transition: color 0.3s ease;
+    white-space: nowrap;
+    padding: 0;
+}
+
+.nav__link::after {
+    content: "";
+    position: absolute;
+    bottom: -4px;
+    left: 0;
+    width: 0;
+    height: 1px;
+    background: var(--gold);
+    transition: width 0.3s ease;
+}
+
+@media (hover: hover) {
+    .nav__link:hover {
+        color: var(--gold);
+    }
+    .nav__link:hover::after {
+        width: 100%;
+    }
+}
+
+.nav__cta {
+    white-space: nowrap;
+}
+
+.nav__toggle {
+    display: none;
+    background: transparent;
+    border: none;
+    color: var(--cream);
+    padding: 0.5rem;
+    cursor: pointer;
+    line-height: 1;
+    font-size: 1.25rem;
+}
+
+.brand {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    background: none;
+    border: none;
+    cursor: pointer;
+    color: var(--cream);
+    text-decoration: none;
+    text-align: left;
+    flex-shrink: 0;
+}
+
+.brand__logo {
+    height: 40px;
+    width: auto;
+}
+
+.brand__text {
+    display: flex;
+    flex-direction: column;
+}
+
+.brand__name {
+    font-family: var(--font-serif);
+    font-weight: 600;
+    font-size: clamp(0.85rem, 1.5vw, 1rem);
+    transition: color 0.3s ease;
+}
+
+@media (hover: hover) {
+    .brand:hover .brand__name {
+        color: var(--gold);
+    }
+}
+
+.brand__tagline {
+    font-size: 0.5rem;
+    text-transform: uppercase;
+    letter-spacing: 0.2em;
+    color: rgba(197, 160, 40, 0.9);
+}
+
+/* Full-screen mobile menu — slides in from the right */
+.mobile-menu {
+    position: fixed;
+    inset: 0;
+    z-index: var(--z-menu);
+    background: rgba(8, 14, 28, 0.98);
+    backdrop-filter: blur(20px);
+    -webkit-backdrop-filter: blur(20px);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transform: translateX(100%);
+    transition: transform 0.5s var(--ease-cinematic);
+}
+
+.mobile-menu--open {
+    transform: translateX(0);
+}
+
+/* Close button — absolute top-right */
+.mobile-menu__close {
+    position: absolute;
+    top: 1.5rem;
+    right: 1.5rem;
+    background: transparent;
+    border: none;
+    color: rgba(250, 248, 244, 0.4);
+    font-size: 1.5rem;
+    cursor: pointer;
+    transition: color 0.2s;
+    line-height: 1;
+    padding: 0.25rem;
+    z-index: 1;
+}
+
+@media (hover: hover) {
+    .mobile-menu__close:hover {
+        color: var(--cream);
+    }
+}
+
+/* Stagger container — receives Framer Motion variants */
+.mobile-menu__links {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 2.5rem;
+    width: 100%;
+}
+.mobile-menu--open {
+    transform: translateX(0);
+}
+
+.mobile-menu__link {
+    background: none;
+    border: none;
+    color: var(--cream);
+    font-family: var(--font-serif);
+    font-size: clamp(1.8rem, 6vw, 2.5rem);
+    cursor: pointer;
+    opacity: 0.85;
+    transition:
+        color 0.2s,
+        opacity 0.2s;
+    letter-spacing: 0.05em;
+}
+
+@media (hover: hover) {
+    .mobile-menu__link:hover {
+        color: var(--gold);
+        opacity: 1;
+    }
+}
+
+.mobile-menu__divider {
+    width: 40px;
+    height: 1px;
+    background: rgba(197, 160, 40, 0.3);
+}
+
+/* ─────────────────────────────────────────────────────────────────
+   8. HERO SECTION
+   ───────────────────────────────────────────────────────────────── */
+.section--hero {
+    min-height: 100vh;
+    min-height: 100svh;
+    display: flex;
+    align-items: center;
+    background-color: var(--void);
+}
+
+/* Cinematic gradient overlay — left-heavy to keep text legible */
+.hero-cinematic-overlay {
+    position: absolute;
+    inset: 0;
+    z-index: 1;
+    background: linear-gradient(
+        108deg,
+        rgba(8, 14, 28, 0.97) 0%,
+        rgba(13, 35, 71, 0.82) 38%,
+        rgba(13, 35, 71, 0.25) 65%,
+        rgba(8, 14, 28, 0.1) 100%
+    );
+}
+
+/* Atmospheric gold light beam */
+.hero-beam {
+    position: absolute;
+    top: 52%;
+    left: -5%;
+    width: 55%;
+    height: 1px;
+    background: linear-gradient(
+        to right,
+        transparent,
+        rgba(197, 160, 40, 0.25),
+        transparent
+    );
+    z-index: 2;
+    pointer-events: none;
+    filter: blur(1px);
+}
+
+/* Two-column grid — text left, eagle slot right */
+.hero-grid {
+    display: grid;
+    grid-template-columns: 1.1fr 0.9fr;
+    gap: clamp(1.5rem, 4vw, 4rem);
+    align-items: center;
+    padding-top: clamp(5rem, 10vh, 7rem);
+    padding-bottom: clamp(3rem, 6vh, 5rem);
+    position: relative;
+    z-index: 2;
+}
+
+.hero-copy {
+    position: relative;
+    z-index: 2;
+}
+
+.hero-eagle-slot {
+    position: relative;
+    min-height: clamp(260px, 38vw, 460px);
+}
+
+.eagle-halo {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    width: 80%;
+    height: 80%;
+    background: radial-gradient(
+        circle,
+        rgba(197, 160, 40, 0.12) 0%,
+        transparent 70%
+    );
+    filter: blur(50px);
+    pointer-events: none;
+}
+
+/* ── Eyebrow ── */
+.hero-eyebrow {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    font-size: 0.65rem;
+    letter-spacing: 0.28em;
+    text-transform: uppercase;
+    color: rgba(250, 248, 244, 0.45);
+    margin-bottom: 2.5rem;
+    font-family: var(--font-sans);
+}
+
+.hero-eyebrow__line {
+    display: block;
+    width: 30px;
+    height: 1px;
+    background: var(--gold);
+    opacity: 0.6;
+}
+
+.hero-eyebrow__dot {
+    display: block;
+    width: 3px;
+    height: 3px;
+    border-radius: 50%;
+    background: rgba(197, 160, 40, 0.5);
+}
+
+/* ── Title — A24 poster typography ── */
+.hero-title {
+    display: flex;
+    flex-direction: column;
+    font-family: var(--font-serif);
+    line-height: 0.95;
+    margin-bottom: 1.25rem;
+    gap: 0;
+}
+
+.hero-title__pre {
+    font-size: clamp(1.2rem, 2vw, 1.6rem);
+    font-style: italic;
+    font-weight: 400;
+    color: rgba(250, 248, 244, 0.65);
+    letter-spacing: 0.08em;
+    margin-bottom: 0.2em;
+}
+
+.hero-title__main {
+    font-size: clamp(3.5rem, 8vw, 7rem);
+    font-weight: 700;
+    line-height: 0.92;
+    letter-spacing: -0.02em;
+}
+
+.hero-title__end {
+    font-size: clamp(3.5rem, 8vw, 7rem);
+    font-weight: 400;
+    line-height: 0.92;
+    color: rgba(250, 248, 244, 0.9);
+    letter-spacing: -0.01em;
+}
+
+/* ── Tagline ── */
+.hero-tagline {
+    font-family: var(--font-serif);
+    font-style: italic;
+    font-size: clamp(1rem, 1.8vw, 1.3rem);
+    color: rgba(250, 248, 244, 0.7);
+    letter-spacing: 0.08em;
+    margin-bottom: 2.5rem;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.75rem;
+}
+
+.hero-tagline::before {
+    content: "";
+    display: block;
+    width: 20px;
+    height: 1px;
+    background: rgba(197, 160, 40, 0.5);
+    flex-shrink: 0;
+}
+
+/* ── Actions ── */
+.hero-actions {
+    display: flex;
+    gap: 1rem;
+    margin-bottom: 3.5rem;
+    flex-wrap: wrap;
+    align-items: center;
+}
+
+.btn--hero-primary {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.6rem;
+    background: var(--red);
+    color: var(--cream);
+    padding: 0.9rem 1.75rem;
+    border-radius: 4px;
+    font-size: 0.88rem;
+    font-weight: 600;
+    text-decoration: none;
+    letter-spacing: 0.02em;
+    border: none;
+    transition: all 0.35s var(--ease-cinematic);
+    cursor: pointer;
+    /* Pulse animation defined below */
+}
+
+@media (hover: hover) {
+    .btn--hero-primary:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 8px 30px rgba(160, 24, 48, 0.5);
+    }
+}
+
+.btn--hero-ghost {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    background: transparent;
+    color: rgba(250, 248, 244, 0.7);
+    padding: 0.9rem 1.5rem;
+    border-radius: 4px;
+    font-size: 0.85rem;
+    font-weight: 500;
+    border: 1px solid rgba(250, 248, 244, 0.15);
+    transition: all 0.35s var(--ease-cinematic);
+    cursor: pointer;
+    font-family: var(--font-sans);
+    backdrop-filter: blur(8px);
+}
+
+@media (hover: hover) {
+    .btn--hero-ghost:hover {
+        border-color: rgba(197, 160, 40, 0.4);
+        color: var(--gold);
+        background: rgba(197, 160, 40, 0.05);
+    }
+}
+
+.btn__icon {
+    flex-shrink: 0;
+    display: flex;
+    align-items: center;
+}
+
+/* ── Stats strip ── */
+.stats-strip {
+    display: flex;
+    align-items: center;
+    gap: 2rem;
+    border-top: 1px solid rgba(197, 160, 40, 0.12);
+    padding-top: 2rem;
+}
+
+.stat-div {
+    width: 1px;
+    height: 28px;
+    background: rgba(197, 160, 40, 0.15);
+}
+
+.stat__val {
+    display: block;
+    font-family: var(--font-serif);
+    font-size: 0.9rem;
+    color: var(--gold);
+    font-weight: 600;
+}
+
+.stat__sub {
+    display: block;
+    font-size: 0.58rem;
+    text-transform: uppercase;
+    letter-spacing: 0.15em;
+    color: rgba(250, 248, 244, 0.35);
+}
+
+/* ── Live inscription badge ── */
+.hero-live-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    font-size: 0.62rem;
+    letter-spacing: 0.18em;
+    text-transform: uppercase;
+    color: rgba(197, 160, 40, 0.9);
+    font-weight: 500;
+    margin-bottom: 1.5rem;
+    border: 1px solid rgba(197, 160, 40, 0.2);
+    padding: 0.35rem 0.85rem;
+    border-radius: 50px;
+    backdrop-filter: blur(4px);
+    background: rgba(197, 160, 40, 0.04);
+}
+
+.hero-live-badge__dot {
+    width: 5px;
+    height: 5px;
+    border-radius: 50%;
+    background: var(--gold);
+    animation: dotPulse 2s ease-in-out infinite;
+    flex-shrink: 0;
+}
+
+/* ── Scroll cue ── */
+.scroll-cue {
+    position: absolute;
+    bottom: 2.5rem;
+    left: 50%;
+    transform: translateX(-50%);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 0.5rem;
+    z-index: 2;
+    animation: scrollCueFade 3s ease-in-out infinite;
+    pointer-events: none;
+}
+
+.scroll-cue__line {
+    width: 1px;
+    height: 40px;
+    background: linear-gradient(
+        to bottom,
+        rgba(197, 160, 40, 0.6),
+        transparent
+    );
+    animation: scrollCueLine 2s ease-in-out infinite;
+}
+
+.scroll-cue__text {
+    font-size: 0.55rem;
+    letter-spacing: 0.25em;
+    text-transform: uppercase;
+    color: rgba(250, 248, 244, 0.3);
+}
+
+/* ─────────────────────────────────────────────────────────────────
+   9. VISION SECTION
+   ───────────────────────────────────────────────────────────────── */
+.section--vision {
+    padding: clamp(5rem, 10vw, 8rem) 0;
+    background-color: var(--deep-navy);
+}
+
+/* Large editorial section-number watermark */
+.section-num {
+    position: absolute;
+    font-family: var(--font-serif);
+    font-size: clamp(6rem, 12vw, 14rem);
+    font-weight: 700;
+    line-height: 1;
+    color: rgba(197, 160, 40, 0.03);
+    top: 2rem;
+    right: 2rem;
+    pointer-events: none;
+    user-select: none;
+    z-index: 0;
+}
+
+/* ── Vision grid — glassmorphic card (restored design intent) ──
+   No column gap; image fills its cell, text column has internal padding.  */
+.vision-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 0;
+    align-items: stretch;
+    border-radius: 16px;
+    overflow: hidden;
+    border: 1px solid rgba(197, 160, 40, 0.12);
+    background-color: rgba(27, 58, 107, 0.3);
+    backdrop-filter: blur(4px);
+    -webkit-backdrop-filter: blur(4px);
+    position: relative;
+    z-index: 2;
+}
+
+.vision-image {
+    position: relative;
+    height: clamp(300px, 45vw, 560px);
+    overflow: hidden;
+}
+
+.vision-image__bg {
+    position: absolute;
+    inset: 0;
+    background-size: cover;
+    background-position: center;
+    transition: transform 0.8s var(--ease-cinematic);
+}
+
+@media (hover: hover) {
+    .vision-image:hover .vision-image__bg {
+        transform: scale(1.04);
+    }
+}
+
+.vision-image__overlay {
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(
+        to right,
+        transparent 40%,
+        rgba(27, 58, 107, 0.85) 100%
+    );
+}
+
+/* Floating editorial quote on the photo */
+.vision-image__caption {
+    position: absolute;
+    bottom: 2rem;
+    left: 1.5rem;
+    right: 1.5rem;
+    z-index: 3;
+}
+
+.vision-image__quote {
+    font-family: var(--font-serif);
+    font-style: italic;
+    font-size: clamp(0.85rem, 1.5vw, 1rem);
+    color: rgba(250, 248, 244, 0.8);
+    border-left: 2px solid rgba(197, 160, 40, 0.5);
+    padding-left: 1rem;
+    line-height: 1.5;
+}
+
+/* Text column — internal padding instead of grid gap */
+.vision-text {
+    padding: clamp(2.5rem, 4vw, 4rem);
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+}
+
+.pillars-row {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.5rem;
+    margin-top: 1.5rem;
+}
+
+.pillar-badge {
+    font-size: 0.62rem;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    padding: 0.35rem 0.75rem;
+    border: 1px solid rgba(197, 160, 40, 0.25);
+    border-radius: 4px;
+    color: rgba(197, 160, 40, 0.85);
+}
+
+/* ─────────────────────────────────────────────────────────────────
+   10. OFFRES SECTION
+   ───────────────────────────────────────────────────────────────── */
+.section--offres {
+    padding: clamp(5rem, 10vw, 8rem) 0;
+}
+
+.section__overlay--offres {
+    position: absolute;
+    inset: 0;
+    background: rgba(8, 14, 28, 0.82);
+    z-index: 1;
+}
+
+.offres-header {
+    margin-bottom: 3rem;
+}
+
+.levels-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: clamp(1.5rem, 3vw, 2.5rem);
+    margin-top: 3rem;
+}
+
+.level-block {
+    background: rgba(27, 58, 107, 0.6);
+    border: 1px solid rgba(197, 160, 40, 0.2);
+    border-radius: 12px;
+    padding: clamp(1.5rem, 3vw, 2.5rem);
+    backdrop-filter: blur(10px);
+    transition:
+        border-color 0.35s var(--ease-cinematic),
+        transform 0.35s var(--ease-cinematic);
+}
+
+@media (hover: hover) {
+    .level-block:hover {
+        border-color: rgba(197, 160, 40, 0.4);
+        transform: translateY(-4px);
+    }
+}
+
+.level-block h3 {
+    font-size: clamp(1.4rem, 2.5vw, 1.8rem);
+    color: var(--gold);
+    margin-bottom: 1rem;
+}
+
+.level-block__number {
+    font-family: var(--font-serif);
+    font-size: 0.65rem;
+    letter-spacing: 0.3em;
+    color: rgba(197, 160, 40, 0.4);
+    text-transform: uppercase;
+    margin-bottom: 1rem;
+}
+
+.level-list {
+    list-style: none;
+    margin-top: 1.25rem;
+}
+
+.level-list li {
+    padding: 0.45rem 0;
+    border-bottom: 1px solid rgba(197, 160, 40, 0.1);
+    font-size: 0.9rem;
+    color: rgba(250, 248, 244, 0.8);
+}
+
+/* ─────────────────────────────────────────────────────────────────
+   11. CAMPUS SECTION
+   ───────────────────────────────────────────────────────────────── */
+.section--campus {
+    position: relative;
+    padding: clamp(7rem, 14vw, 12rem) 0;
+    overflow: hidden;
+    isolation: isolate;
+}
+
+.section__overlay--campus {
+    position: absolute;
+    inset: 0;
+    /* Left-heavy gradient — keeps glassmorphic panel legible */
+    background: linear-gradient(
+        to right,
+        rgba(8, 14, 28, 0.96) 0%,
+        rgba(13, 35, 71, 0.55) 55%,
+        rgba(8, 14, 28, 0.2) 100%
+    );
+    z-index: 1;
+}
+
+.campus-panel {
+    background: rgba(8, 14, 28, 0.75);
+    backdrop-filter: blur(16px);
+    -webkit-backdrop-filter: blur(16px);
+    padding: clamp(2.5rem, 4vw, 4rem);
+    border-radius: 16px;
+    max-width: 520px;
+    border: 1px solid rgba(197, 160, 40, 0.15);
+    position: relative;
+    z-index: 2;
+}
+
+/* ─────────────────────────────────────────────────────────────────
+   12. TRANSPORT SECTION
+   ───────────────────────────────────────────────────────────────── */
+/* ── Transport — full-bleed cinematic. Panel sits on the right,
+   mirroring Campus’s left-aligned panel for visual L/R rhythm. ── */
+.section--transport {
+    position: relative;
+    padding: clamp(7rem, 14vw, 12rem) 0;
+    overflow: hidden;
+    isolation: isolate;
+}
+
+.section__overlay--transport {
+    position: absolute;
+    inset: 0;
+    /* Right-heavy gradient — darkness wraps the panel on the right */
+    background: linear-gradient(
+        to left,
+        rgba(8, 14, 28, 0.96) 0%,
+        rgba(13, 35, 71, 0.55) 55%,
+        rgba(8, 14, 28, 0.2) 100%
+    );
+    z-index: 1;
+}
+
+.transport-panel {
+    background: rgba(8, 14, 28, 0.75);
+    backdrop-filter: blur(16px);
+    -webkit-backdrop-filter: blur(16px);
+    padding: clamp(2.5rem, 4vw, 4rem);
+    border-radius: 16px;
+    max-width: 520px;
+    border: 1px solid rgba(197, 160, 40, 0.15);
+    position: relative;
+    z-index: 2;
+    margin-left: auto;
+}
+
+.transport-features {
+    list-style: none;
+    display: flex;
+    flex-direction: column;
+    gap: 0.55rem;
+    margin-top: 1.25rem;
+    margin-bottom: 0.75rem;
+}
+
+.transport-features li {
+    font-size: 0.9rem;
+    color: rgba(250, 248, 244, 0.75);
+    padding-left: 1.25rem;
+    position: relative;
+    line-height: 1.4;
+}
+
+.transport-features li::before {
+    content: "—";
+    position: absolute;
+    left: 0;
+    color: rgba(197, 160, 40, 0.6);
+    font-size: 0.8rem;
+}
+
+/* ─────────────────────────────────────────────────────────────────
+   13. INSCRIPTIONS SECTION
+   ───────────────────────────────────────────────────────────────── */
+.section--inscriptions {
+    position: relative;
+    padding: clamp(6rem, 12vw, 10rem) 0;
+    overflow: hidden;
+    min-height: 85vh;
+    display: flex;
+    align-items: center;
+    isolation: isolate;
+}
+
+.section__overlay--inscriptions {
+    position: absolute;
+    inset: 0;
+    background: radial-gradient(
+        ellipse at center,
+        rgba(13, 35, 71, 0.6) 0%,
+        rgba(8, 14, 28, 0.88) 100%
+    );
+    z-index: 1;
+}
+
+.inscriptions-content {
+    text-align: center;
+    position: relative;
+    z-index: 2;
+}
+
+/* Logo dramatic reveal — only appears at inscription section, not in hero */
+.inscriptions-logo-wrap {
+    margin-bottom: 2.5rem;
+    display: flex;
+    justify-content: center;
+}
+
+.inscriptions-logo {
+    height: clamp(60px, 8vw, 90px);
+    animation: inscriptionsLogoGlow 4s ease-in-out infinite;
+}
+
+.inscriptions-title {
+    font-family: var(--font-serif);
+    font-size: clamp(2.5rem, 6vw, 4.5rem);
+    line-height: 1.05;
+    margin-bottom: 1.5rem;
+}
+
+.inscriptions-date {
+    font-size: clamp(1rem, 2vw, 1.25rem);
+    color: var(--cream);
+    margin-bottom: 1rem;
+    font-weight: 500;
+    letter-spacing: 0.05em;
+}
+
+.inscriptions-sub {
+    font-size: 1rem;
+    color: rgba(250, 248, 244, 0.65);
+    margin-bottom: 3rem;
+    max-width: 480px;
+    margin-left: auto;
+    margin-right: auto;
+    line-height: 1.6;
+}
+
+.inscriptions-actions {
+    display: flex;
+    gap: 1rem;
+    justify-content: center;
+    flex-wrap: wrap;
+    align-items: center;
+}
+
+/* Gold CTA — the narrative climax button */
+.btn--inscription-primary {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.6rem;
+    background: linear-gradient(
+        135deg,
+        var(--bronze) 0%,
+        var(--gold) 50%,
+        #f0d875 100%
+    );
+    color: var(--void);
+    padding: 1.1rem 2.25rem;
+    border-radius: 4px;
+    font-size: 0.9rem;
+    font-weight: 700;
+    border: none;
+    cursor: pointer;
+    font-family: var(--font-sans);
+    letter-spacing: 0.03em;
+    transition: all 0.35s var(--ease-cinematic);
+    box-shadow: 0 0 40px rgba(197, 160, 40, 0.2);
+}
+
+@media (hover: hover) {
+    .btn--inscription-primary:hover {
+        transform: translateY(-3px);
+        box-shadow: 0 10px 40px rgba(197, 160, 40, 0.4);
+        filter: brightness(1.08);
+    }
+}
+
+/* Brand-red pulse for WhatsApp CTA buttons (intentional: school brand color) */
+.cta-wa {
+    animation: redCTAPulse 3s ease-in-out infinite;
+}
+
+/* ─────────────────────────────────────────────────────────────────
+   14. FAQ SECTION
+   ───────────────────────────────────────────────────────────────── */
+.section--faq {
+    padding: clamp(4rem, 8vw, 6rem) 0;
+    background: var(--navy);
+}
+
+.faq-list {
+    max-width: 760px;
+    margin: 0 auto;
+}
+
+.faq-item {
+    border: 1px solid rgba(197, 160, 40, 0.15);
+    border-radius: 8px;
+    margin-bottom: 0.75rem;
+    overflow: hidden;
+    background: rgba(13, 35, 71, 0.5);
+    transition: border-color 0.35s var(--ease-cinematic);
+}
+
+.faq-item--open {
+    border-color: rgba(197, 160, 40, 0.35);
+}
+
+.faq-item__q {
+    width: 100%;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 1rem;
+    padding: clamp(1rem, 2vw, 1.25rem) 1.5rem;
+    background: none;
+    border: none;
+    color: var(--cream);
+    font-family: var(--font-serif);
+    font-size: clamp(0.95rem, 1.8vw, 1.05rem);
+    text-align: left;
+    cursor: pointer;
+    transition: color 0.25s ease;
+}
+
+.faq-item--open .faq-item__q {
+    color: var(--gold);
+}
+
+.faq-item__icon {
+    color: var(--gold);
+    font-size: 1.25rem;
+    flex-shrink: 0;
+}
+
+/* ── Accordion animation — CSS grid-template-rows trick.
+   Most performant approach: no JS height calculation,
+   no max-height hack. Browser animates rows natively.    ── */
+.faq-item__a-wrap {
+    display: grid;
+    grid-template-rows: 0fr; /* Collapsed: inner content is 0 height */
+    transition: grid-template-rows 0.45s var(--ease-cinematic);
+}
+
+.faq-item__a-wrap--open {
+    grid-template-rows: 1fr; /* Expanded: inner content at natural height */
+}
+
+.faq-item__a {
+    overflow: hidden; /* Required: clips content in 0fr state */
+    padding: 0 1.5rem;
+    color: rgba(250, 248, 244, 0.75);
+    font-size: 0.95rem;
+    line-height: 1.65;
+    transition: padding-bottom 0.45s var(--ease-cinematic);
+}
+
+/* Animate padding-bottom separately so it opens/closes smoothly */
+.faq-item__a-wrap--open .faq-item__a {
+    padding-bottom: 1.25rem;
+}
+
+/* ─────────────────────────────────────────────────────────────────
+   15. FOOTER
+   ───────────────────────────────────────────────────────────────── */
+.footer {
+    background-color: var(--void);
+    padding: clamp(3rem, 6vw, 5rem) 0 2rem;
+    border-top: 1px solid rgba(197, 160, 40, 0.15);
+}
+
+.footer-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr 1.2fr;
+    gap: clamp(1.5rem, 3vw, 2.5rem);
+    align-items: start;
+    margin-bottom: 2rem;
+}
+
+.footer-school-name {
+    font-family: var(--font-serif);
+    font-size: 1.1rem;
+    color: var(--cream);
+    margin-bottom: 0.25rem;
+}
+
+.footer-arabic {
+    font-family: var(--font-arabic);
+    font-size: 0.95rem;
+    color: rgba(197, 160, 40, 0.7);
+    direction: rtl;
+    margin-bottom: 0.75rem;
+}
+
+.footer-address {
+    font-size: 0.8rem;
+    color: rgba(250, 248, 244, 0.45);
+    line-height: 1.5;
+    margin-bottom: 0.5rem;
+}
+
+.footer-tagline {
+    font-family: var(--font-serif);
+    font-style: italic;
+    font-size: 0.8rem;
+    color: rgba(197, 160, 40, 0.6);
+}
+
+.footer-contact {
+    display: flex;
+    flex-direction: column;
+    gap: 0.75rem;
+}
+
+.footer-contact h4 {
+    font-family: var(--font-serif);
+    color: var(--gold);
+    margin-bottom: 0.5rem;
+}
+
+.footer-contact a {
+    color: rgba(250, 248, 244, 0.8);
+    text-decoration: none;
+    font-size: 0.9rem;
+    transition: color 0.2s;
+}
+
+@media (hover: hover) {
+    .footer-contact a:hover {
+        color: var(--gold);
+    }
+}
+
+.footer-map iframe {
+    width: 100%;
+    height: 200px;
+    border: 1px solid rgba(197, 160, 40, 0.2);
+    border-radius: 8px;
+}
+
+.footer-bottom-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 1rem;
+    border-top: 1px solid rgba(197, 160, 40, 0.08);
+    padding-top: 2rem;
+    margin-top: 2.5rem;
+}
+
+.footer-social {
+    display: flex;
+    gap: 2rem;
+}
+
+.footer-social a {
+    color: rgba(250, 248, 244, 0.5);
+    text-decoration: none;
+    font-size: 0.85rem;
+    transition: color 0.2s;
+}
+
+@media (hover: hover) {
+    .footer-social a:hover {
+        color: var(--gold);
+    }
+}
+
+.footer-bottom {
+    font-size: 0.72rem;
+    color: rgba(250, 248, 244, 0.3);
+    text-align: right;
+}
+
+.footer-domain {
+    color: rgba(197, 160, 40, 0.4);
+    margin-top: 0.2rem;
+}
+
+/* ─────────────────────────────────────────────────────────────────
+   16. STICKY WHATSAPP PILL
+   ───────────────────────────────────────────────────────────────── */
+.sticky-wa {
+    position: fixed;
+    bottom: 2rem;
+    right: 2rem;
+    background-color: var(--wa);
+    color: white;
+    padding: 0.75rem 1.25rem;
+    border-radius: 50px;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    text-decoration: none;
+    font-weight: 600;
+    font-size: 0.85rem;
+    box-shadow: 0 4px 20px rgba(37, 211, 102, 0.4);
+    z-index: var(--z-sticky);
+    animation: waPulse 3s ease-in-out infinite;
+    transition:
+        transform 0.35s var(--ease-cinematic),
+        opacity 0.4s var(--ease-cinematic),
+        visibility 0.4s;
+    opacity: 0;
+    visibility: hidden;
+    transform: translateY(10px);
+}
+
+.sticky-wa--visible {
+    opacity: 1;
+    visibility: visible;
+    transform: translateY(0);
+}
+
+@media (hover: hover) {
+    .sticky-wa:hover {
+        transform: scale(1.05);
+    }
+}
+
+/* ─────────────────────────────────────────────────────────────────
+   17. ANIMATIONS
+   ───────────────────────────────────────────────────────────────── */
+@keyframes goldShimmer {
+    0% {
+        background-position: -200% center;
+    }
+    100% {
+        background-position: 200% center;
+    }
+}
+
+@keyframes scrollCueLine {
+    0%,
+    100% {
+        transform: scaleY(1);
+        opacity: 0.6;
+    }
+    50% {
+        transform: scaleY(0.5);
+        opacity: 0.2;
+    }
+}
+
+@keyframes scrollCueFade {
+    0%,
+    100% {
+        opacity: 0.8;
+    }
+    50% {
+        opacity: 0.3;
+    }
+}
+
+@keyframes inscriptionsLogoGlow {
+    0%,
+    100% {
+        filter: drop-shadow(0 0 20px rgba(197, 160, 40, 0.25));
+    }
+    50% {
+        filter: drop-shadow(0 0 45px rgba(197, 160, 40, 0.55));
+    }
+}
+
+/* Green pulse for sticky WA pill */
+@keyframes dotPulse {
+    0%,
+    100% {
+        opacity: 1;
+        transform: scale(1);
+        box-shadow: 0 0 0 0 rgba(197, 160, 40, 0.4);
+    }
+    50% {
+        opacity: 0.55;
+        transform: scale(0.75);
+        box-shadow: 0 0 0 4px rgba(197, 160, 40, 0);
+    }
+}
+
+@keyframes waPulse {
+    0%,
+    100% {
+        box-shadow: 0 4px 20px rgba(37, 211, 102, 0.4);
+    }
+    50% {
+        box-shadow: 0 4px 40px rgba(37, 211, 102, 0.7);
+    }
+}
+
+/* Red pulse for brand-colored CTA buttons (school red = primary CTA color) */
+@keyframes redCTAPulse {
+    0%,
+    100% {
+        box-shadow: 0 4px 16px rgba(160, 24, 48, 0.3);
+    }
+    50% {
+        box-shadow: 0 4px 30px rgba(160, 24, 48, 0.6);
+    }
+}
+
+/* ─────────────────────────────────────────────────────────────────
+   17b. SECTION GRADIENT BRIDGES
+   Atmospheric fades at section boundaries — eliminates hard color
+   cuts between sections with different background colors.
+   ───────────────────────────────────────────────────────────────── */
+
+/* Vision (deep-navy) → Offres (void) */
+.section--vision::after {
+    content: "";
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    height: 80px;
+    background: linear-gradient(to bottom, transparent, var(--void));
+    z-index: 3;
+    pointer-events: none;
+}
+
+/* FAQ (navy) → Footer (void) */
+.section--faq::after {
+    content: "";
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    height: 80px;
+    background: linear-gradient(to bottom, transparent, var(--void));
+    z-index: 3;
+    pointer-events: none;
+}
+
+/* ─────────────────────────────────────────────────────────────────
+   17c. LEAD FORM MODAL
+   Extracted from LeadFormModal.jsx inline styles.
+   All modal presentation is now here, not in the component.
+   ───────────────────────────────────────────────────────────────── */
+
+.lead-modal-wrapper {
+    position: fixed;
+    inset: 0;
+    z-index: var(--z-modal);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+/* Blurred backdrop */
+.lead-modal-backdrop {
+    position: absolute;
+    inset: 0;
+    background-color: rgba(8, 18, 38, 0.8);
+    backdrop-filter: blur(8px);
+    -webkit-backdrop-filter: blur(8px);
+    z-index: 0;
+}
+
+/* Glassmorphic card */
+.lead-modal-content {
+    position: relative;
+    z-index: 1;
+    width: 100%;
+    max-width: 400px;
+    margin: 0 clamp(1rem, 4vw, 1.5rem);
+    background: rgba(13, 35, 71, 0.85);
+    border: 1px solid rgba(197, 160, 40, 0.2);
+    border-radius: 12px;
+    padding: clamp(1.75rem, 4vw, 2.5rem);
+    backdrop-filter: blur(20px);
+    -webkit-backdrop-filter: blur(20px);
+    box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
+    color: var(--cream);
+}
+
+.lead-modal-close {
+    position: absolute;
+    top: 1rem;
+    right: 1rem;
+    background: transparent;
+    border: none;
+    color: rgba(250, 248, 244, 0.4);
+    cursor: pointer;
+    font-size: 1.2rem;
+    transition: color 0.2s;
+    line-height: 1;
+    padding: 0.25rem;
+}
+
+@media (hover: hover) {
+    .lead-modal-close:hover {
+        color: var(--cream);
+    }
+}
+
+/* ── Success state ── */
+.lead-modal-success {
+    text-align: center;
+    padding: 2rem 0;
+}
+
+.lead-modal-success__icon {
+    font-size: 3rem;
+    margin-bottom: 1rem;
+    display: block;
+}
+
+.lead-modal-success__title {
+    font-family: var(--font-serif);
+    color: var(--gold);
+    font-size: 1.5rem;
+    margin-bottom: 0.5rem;
+}
+
+.lead-modal-success__text {
+    color: rgba(250, 248, 244, 0.7);
+    font-size: 0.9rem;
+}
+
+/* ── Form heading ── */
+.lead-modal-title {
+    font-family: var(--font-serif);
+    color: var(--gold);
+    font-size: 1.5rem;
+    margin-bottom: 0.5rem;
+}
+
+.lead-modal-subtitle {
+    color: rgba(250, 248, 244, 0.7);
+    font-size: 0.85rem;
+    margin-bottom: 2rem;
+    line-height: 1.55;
+}
+
+/* ── Form fields ── */
+.lead-form {
+    display: flex;
+    flex-direction: column;
+    gap: 1.2rem;
+}
+
+.lead-form-group {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+}
+
+.lead-form-label {
+    font-size: 0.75rem;
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+    color: rgba(250, 248, 244, 0.5);
+}
+
+.lead-form-input,
+.lead-form-select {
+    width: 100%;
+    padding: 0.75rem 1rem;
+    background-color: rgba(8, 18, 38, 0.5);
+    border: 1px solid rgba(197, 160, 40, 0.2);
+    border-radius: 6px;
+    color: var(--cream);
+    font-family: var(--font-sans);
+    font-size: 0.95rem;
+    outline: none;
+    transition: border-color 0.25s ease;
+}
+
+.lead-form-input:focus,
+.lead-form-select:focus {
+    border-color: rgba(197, 160, 40, 0.5);
+}
+
+.lead-form-select {
+    appearance: none;
+    -webkit-appearance: none;
+}
+
+.lead-form-error {
+    color: #ff6b6b;
+    font-size: 0.8rem;
+    margin-top: -0.25rem;
+}
+
+.lead-form-submit {
+    margin-top: 0.75rem;
+    padding: 1rem;
+    background: linear-gradient(
+        135deg,
+        var(--bronze) 0%,
+        var(--gold) 50%,
+        #f0d875 100%
+    );
+    color: var(--void);
+    border: none;
+    border-radius: 6px;
+    font-family: var(--font-sans);
+    font-weight: 700;
+    font-size: 0.9rem;
+    cursor: pointer;
+    letter-spacing: 0.02em;
+    transition: all 0.3s var(--ease-cinematic);
+}
+
+@media (hover: hover) {
+    .lead-form-submit:hover:not(:disabled) {
+        filter: brightness(1.08);
+        transform: translateY(-1px);
+        box-shadow: 0 6px 24px rgba(197, 160, 40, 0.3);
+    }
+}
+
+.lead-form-submit:disabled {
+    opacity: 0.65;
+    cursor: not-allowed;
+}
+
+/* ─────────────────────────────────────────────────────────────────
+   18. UTILITY CLASSES
+   ───────────────────────────────────────────────────────────────── */
+.mt-3 {
+    margin-top: 1rem;
+}
+.mt-4 {
+    margin-top: 1.5rem;
+}
+.mb-5 {
+    margin-bottom: 3rem;
+}
+.text-center {
+    text-align: center;
+}
+
+/* ─────────────────────────────────────────────────────────────────
+   19. RESPONSIVE BREAKPOINTS
+   Philosophy: mobile is a premium app experience,
+   not a squeezed desktop version.
+   ───────────────────────────────────────────────────────────────── */
+
+/* ── Tablet (≤ 1024px) ── */
+@media (max-width: 1024px) {
+    .eagle-canvas-wrap {
+        width: 55vw;
+        opacity: 0.55;
+        mix-blend-mode: screen;
+    }
+
+    .vision-grid {
+        grid-template-columns: 1fr;
+    }
+
+    .vision-image {
+        height: clamp(250px, 40vw, 400px);
+    }
+
+    .footer-grid {
+        grid-template-columns: 1fr 1fr;
+    }
+
+    .footer-map {
+        grid-column: span 2;
+    }
+}
+
+/* ── Mobile (≤ 768px) ── */
+@media (max-width: 768px) {
+    /* Nav */
+    .nav__links,
+    .nav__cta {
+        display: none;
+    }
+
+    .nav__toggle {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    }
+
+    /* Eagle — thin atmospheric strip */
+    .eagle-canvas-wrap {
+        width: 100vw;
+        height: 50vh;
+        opacity: 0.18;
+        mix-blend-mode: screen;
+    }
+
+    /* Hero — single column, centered */
+    .hero-grid {
+        grid-template-columns: 1fr;
+        text-align: center;
+        padding-top: clamp(6rem, 12vh, 8rem);
+        padding-bottom: 4rem;
+        gap: 0;
+    }
+
+    .hero-copy {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+    }
+
+    .hero-eyebrow {
+        justify-content: center;
+    }
+
+    .hero-title__main,
+    .hero-title__end {
+        font-size: clamp(3rem, 11vw, 4.5rem);
+    }
+
+    .hero-title__pre {
+        font-size: clamp(1rem, 3vw, 1.3rem);
+    }
+
+    .hero-eagle-slot {
+        display: none;
+    }
+
+    .stats-strip {
+        justify-content: center;
+        flex-wrap: wrap;
+        gap: 1rem;
+    }
+
+    .stat-div {
+        display: none;
+    }
+
+    /* Stronger overlay for mobile text legibility */
+    .hero-cinematic-overlay {
+        background: linear-gradient(
+            180deg,
+            rgba(8, 14, 28, 0.93) 0%,
+            rgba(8, 14, 28, 0.78) 100%
+        );
+    }
+
+    /* Buttons — full width, stacked */
+    .hero-actions {
+        flex-direction: column;
+        align-items: center;
+        width: 100%;
+    }
+
+    .btn--hero-primary,
+    .btn--hero-ghost {
+        width: 100%;
+        max-width: 320px;
+        justify-content: center;
+    }
+
+    /* Vision — stacked, image first */
+    .vision-grid {
+        grid-template-columns: 1fr;
+    }
+    .vision-image {
+        min-height: 260px;
+        order: 1;
+    }
+    .vision-text {
+        order: 2;
+    }
+
+    .vision-image__overlay {
+        background: linear-gradient(
+            to bottom,
+            transparent 40%,
+            rgba(27, 58, 107, 0.9) 100%
+        );
+    }
+
+    /* Offres */
+    .levels-grid {
+        grid-template-columns: 1fr;
+        gap: 1.25rem;
+    }
+
+    /* Transport — full-width panel on mobile */
+    .transport-panel {
+        max-width: 100%;
+        margin-left: 0;
+    }
+
+    /* Footer — centered single column */
+    .footer-grid {
+        grid-template-columns: 1fr;
+        text-align: center;
+    }
+
+    .footer-map {
+        grid-column: 1;
+    }
+    .footer-brand {
+        text-align: center;
+    }
+
+    .footer-bottom-row {
+        flex-direction: column;
+        align-items: center;
+        text-align: center;
+    }
+
+    .footer-bottom {
+        text-align: center;
+    }
+
+    /* Inscriptions */
+    .inscriptions-actions {
+        flex-direction: column;
+        align-items: center;
+    }
+
+    .btn--inscription-primary {
+        width: 100%;
+        max-width: 320px;
+        justify-content: center;
+    }
+
+    /* FAQ — tighter padding */
+    .faq-item__q {
+        padding: 1rem 1.25rem;
+        font-size: 0.95rem;
+    }
+    .faq-item__a {
+        padding: 0 1.25rem;
+    }
+
+    .faq-item__a-wrap--open .faq-item__a {
+        padding-bottom: 1rem;
+    }
+
+    /* Campus — full width panel */
+    .campus-panel {
+        max-width: 100%;
+    }
+}
+
+/* ── Small Mobile (≤ 480px) ── */
+@media (max-width: 480px) {
+    .nav__inner {
+        padding: 0 1rem;
+    }
+    .brand__text {
+        display: none;
+    } /* Show logo icon only */
+    .section--faq {
+        padding: 3rem 0;
+    }
+    .footer-social {
+        gap: 1.5rem;
+    }
+}
+
+/* ── Touch: disable hover effects that feel wrong on tap ── */
+@media (hover: none) {
+    .card-3d:hover {
+        transform: none;
+        box-shadow: none;
+    }
+    .btn-red:hover {
+        transform: none;
+        filter: none;
+    }
+    .btn-outline:hover {
+        transform: none;
+    }
+    .level-block:hover {
+        transform: none;
+        border-color: rgba(197, 160, 40, 0.2);
+    }
+}
+
+/* ── Reduced Motion: respect user preference ── */
+@media (prefers-reduced-motion: reduce) {
+    .eagle-canvas-wrap {
+        display: none;
+    }
+    .gold-gradient-text {
+        animation: none;
+    }
+    .btn--hero-primary {
+        animation: none;
+    }
+    .cta-wa {
+        animation: none;
+    }
+    .sticky-wa {
+        animation: none;
+    }
+    .inscriptions-logo {
+        animation: none;
+    }
+    html {
+        scroll-behavior: auto;
+    }
+}

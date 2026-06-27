@@ -1,0 +1,113 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Registre Sécurisé | Alam Al Maarifa</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,600;0,700;1,400&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <!-- Background overlay for atmosphere -->
+    <div class="noise-bg"></div>
+    <div class="ambient-glow"></div>
+
+    <main class="dashboard-container">
+        <!-- Header -->
+        <header class="secure-header fade-up">
+            <div class="logo-area">
+                <img src="../assets/logo.png" alt="Logo" class="mono-logo">
+                <div class="status-indicator">
+                    <span class="pulse-dot"></span>
+                    <span class="status-text">Connexion Sécurisée</span>
+                </div>
+            </div>
+            <h1 class="page-title">Registre des Inscriptions</h1>
+        </header>
+
+        <!-- Ledger Container -->
+        <div class="ledger-wrapper">
+            <!-- Headers -->
+            <div class="ledger-header fade-up delay-1">
+                <div class="col-date">Date</div>
+                <div class="col-parent">Parent (Tuteur)</div>
+                <div class="col-phone">Téléphone</div>
+                <div class="col-cycle">Cycle visé</div>
+                <div class="col-status">Statut</div>
+            </div>
+
+            <!-- Leads List -->
+            <div class="ledger-list" id="ledger-list">
+                <!-- Mock Lead 1 -->
+                <div class="lead-row stagger-item">
+                    <div class="col-date data-mono">27 Juin 2026</div>
+                    <div class="col-parent">Youssef El Amrani</div>
+                    <div class="col-phone data-mono">+212 661 00 22 33</div>
+                    <div class="col-cycle">Primaire</div>
+                    <div class="col-status"><span class="badge badge-new">Nouveau</span></div>
+                </div>
+
+                <!-- Mock Lead 2 -->
+                <div class="lead-row stagger-item">
+                    <div class="col-date data-mono">26 Juin 2026</div>
+                    <div class="col-parent">Salma Bennani</div>
+                    <div class="col-phone data-mono">+212 612 34 56 78</div>
+                    <div class="col-cycle">Maternelle</div>
+                    <div class="col-status"><span class="badge badge-new">Nouveau</span></div>
+                </div>
+
+                <!-- Mock Lead 3 -->
+                <div class="lead-row stagger-item">
+                    <div class="col-date data-mono">25 Juin 2026</div>
+                    <div class="col-parent">Karim Chraibi</div>
+                    <div class="col-phone data-mono">+212 600 11 99 88</div>
+                    <div class="col-cycle">Primaire</div>
+                    <div class="col-status"><span class="badge badge-contacted">Contacté</span></div>
+                </div>
+
+                <!-- Mock Lead 4 -->
+                <div class="lead-row stagger-item">
+                    <div class="col-date data-mono">24 Juin 2026</div>
+                    <div class="col-parent">Laila Tahiri</div>
+                    <div class="col-phone data-mono">+212 677 88 55 22</div>
+                    <div class="col-cycle">Maternelle</div>
+                    <div class="col-status"><span class="badge badge-contacted">Contacté</span></div>
+                </div>
+            </div>
+            
+            <!-- Success Message (Hidden initially) -->
+            <div class="success-message" id="success-message">
+                <div class="success-line"></div>
+                <h2 class="success-text">Registre Sécurisé — Données Exportées</h2>
+            </div>
+        </div>
+        
+        <!-- Export Button -->
+        <div class="action-footer fade-up delay-2">
+            <button id="export-btn" class="btn-export">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path><polyline points="7 10 12 15 17 10"></polyline><line x1="12" y1="15" x2="12" y2="3"></line></svg>
+                Exporter et Archiver
+            </button>
+        </div>
+    </main>
+
+    <!-- Secure Modal -->
+    <div class="secure-modal" id="secure-modal">
+        <div class="modal-content">
+            <div class="modal-icon">🔒</div>
+            <h3>Autorisation Requise</h3>
+            <p>Êtes-vous sûr de vouloir exporter et archiver ce registre ? Les données seront réinitialisées pour la prochaine session.</p>
+            <div class="modal-actions">
+                <button id="cancel-btn" class="btn-secondary">Annuler</button>
+                <button id="confirm-export-btn" class="btn-primary">Confirmer l'Archivage</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- GSAP for Animations -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js"></script>
+    <script type="module" src="script.js"></script>
+</body>
+</html>
