@@ -70,15 +70,32 @@
     box-sizing: border-box;
 }
 
-/* Hide system cursor on fine-pointer devices — replaced by CustomCursor */
-@media (pointer: fine) {
-    * {
-        cursor: none !important;
-    }
+/* Custom cursor hides the system cursor only when it is active and the
+   user has not requested reduced motion. The class is toggled by JS. */
+html.custom-cursor-active * {
+    cursor: none !important;
 }
 
 html {
     scroll-behavior: smooth;
+}
+
+/* Reduced motion: disable smooth scroll, Lenis, and decorative motion. */
+@media (prefers-reduced-motion: reduce) {
+    html {
+        scroll-behavior: auto !important;
+    }
+    html.lenis,
+    html.lenis body {
+        height: auto !important;
+    }
+    *,
+    *::before,
+    *::after {
+        animation-duration: 0.01ms !important;
+        animation-iteration-count: 1 !important;
+        transition-duration: 0.01ms !important;
+    }
 }
 
 body {
@@ -1376,9 +1393,36 @@ h3 {
    15. FOOTER
    ───────────────────────────────────────────────────────────────── */
 .footer {
+    position: relative;
     background-color: var(--void);
     padding: clamp(3rem, 6vw, 5rem) 0 2rem;
     border-top: 1px solid rgba(197, 160, 40, 0.15);
+    overflow: hidden;
+}
+
+.footer__bg {
+    position: absolute;
+    inset: 0;
+    background-size: cover;
+    background-position: center;
+    opacity: 0.18;
+    filter: grayscale(30%);
+}
+
+.footer__overlay {
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(
+        to bottom,
+        var(--void) 0%,
+        rgba(8, 14, 28, 0.92) 40%,
+        var(--void) 100%
+    );
+}
+
+.footer > .container {
+    position: relative;
+    z-index: 1;
 }
 
 .footer-grid {

@@ -25,6 +25,11 @@ export default function App() {
   const [isFormOpen, setIsFormOpen] = useState(false);
 
   useEffect(() => {
+    const prefersReducedMotion = window.matchMedia(
+      "(prefers-reduced-motion: reduce)",
+    ).matches;
+    if (prefersReducedMotion) return;
+
     const lenis = new Lenis({
       lerp: 0.08,
       smoothWheel: true,

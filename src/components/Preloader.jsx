@@ -34,7 +34,7 @@ export default function Preloader() {
             gap: "2rem",
           }}
         >
-          {/* Logo — path fixed: publicDir is "assets", so /logo.png is correct */}
+          {/* Logo — served from publicDir */}
           <motion.img
             src="/logo.png"
             alt="Alam Al Maarifa"

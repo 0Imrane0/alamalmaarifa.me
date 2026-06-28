@@ -453,6 +453,12 @@ export function FooterSection() {
 
   return (
     <footer id="footer" className="footer">
+      <div
+        className="footer__bg"
+        style={{ backgroundImage: `url(${MOMENTS.footer})` }}
+        aria-hidden="true"
+      />
+      <div className="footer__overlay" aria-hidden="true" />
       <div className="container">
         <div className="footer-grid">
           <div className="footer-brand">

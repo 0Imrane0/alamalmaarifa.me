@@ -8,14 +8,17 @@ export default function CustomCursor() {
 
   // Use a ref to track visibility inside event callbacks without
   // re-registering listeners every time isVisible changes.
-  // Bug fixed: the original used [isVisible] as a dep, causing
-  // the effect to tear down and re-attach listeners on every
-  // mouse-enter/leave, creating a brief window with no listeners.
   const isVisibleRef = useRef(false);
 
   useEffect(() => {
-    // Only activate on fine-pointer devices (mouse, not touch)
-    if (window.matchMedia("(pointer: coarse)").matches) return;
+    // Respect reduced-motion and coarse-pointer preferences.
+    const prefersReducedMotion = window.matchMedia(
+      "(prefers-reduced-motion: reduce)",
+    ).matches;
+    const isCoarse = window.matchMedia("(pointer: coarse)").matches;
+    if (prefersReducedMotion || isCoarse) return;
+
+    document.documentElement.classList.add("custom-cursor-active");
 
     const updateMousePosition = (e) => {
       setMousePosition({ x: e.clientX, y: e.clientY });
@@ -48,12 +51,13 @@ export default function CustomCursor() {
     document.body.addEventListener("mouseenter", handleMouseEnter);
 
     return () => {
+      document.documentElement.classList.remove("custom-cursor-active");
       window.removeEventListener("mousemove", updateMousePosition);
       window.removeEventListener("mouseover", handleElementHover);
       document.body.removeEventListener("mouseleave", handleMouseLeave);
       document.body.removeEventListener("mouseenter", handleMouseEnter);
     };
-  }, []); // Empty deps: listeners registered once, visibility managed via ref
+  }, []);
 
   if (!isVisible) return null;
 

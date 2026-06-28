@@ -79,11 +79,11 @@ export const HERO_STATS = [
 ];
 
 export const PILLARS = [
-  { key: "vision", label: "Vision", glb: "pillar-01-vision.glb" },
-  { key: "savoir", label: "Savoir", glb: "pillar-02-savoir.glb" },
-  { key: "protection", label: "Protection", glb: "pillar-03-protection.glb" },
-  { key: "confiance", label: "Confiance", glb: "pillar-04-confiance.glb" },
-  { key: "envol", label: "Envol", glb: "pillar-05-envol.glb" },
+  { key: "vision", label: "Vision", glb: "pillar-01-vision-lite.glb" },
+  { key: "savoir", label: "Savoir", glb: "pillar-02-savoir-lite.glb" },
+  { key: "protection", label: "Protection", glb: "pillar-03-protection-lite.glb" },
+  { key: "confiance", label: "Confiance", glb: "pillar-04-confiance-lite.glb" },
+  { key: "envol", label: "Envol", glb: "pillar-05-envol-lite.glb" },
 ];
 
 export const FAQ_ITEMS = [
@@ -134,6 +134,7 @@ export const MOMENTS = {
   campus: "/moments/moment_04_campus.png",
   transport: "/moments/moment_05_transport.png",
   inscriptions: "/moments/moment_06_inscriptions.png",
+  footer: "/moments/moment_07_footer.png",
 };
 
 export const SEO = {
