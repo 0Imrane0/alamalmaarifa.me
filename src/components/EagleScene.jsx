@@ -1,4 +1,4 @@
-import { Suspense, useMemo, useRef, useState } from "react";
+import { Suspense, useEffect, useMemo, useRef, useState } from "react";
 import { Canvas, useFrame } from "@react-three/fiber";
 import {
   Environment,
@@ -126,9 +126,25 @@ function PillarModel({ index, glb, position, baseScale, baseRotation }) {
 }
 
 function CinematicDust() {
-  const [sphere] = useState(() => randomInSphere(new Float32Array(3000), 10));
+  const [count, setCount] = useState(3000);
+
+  useEffect(() => {
+    const reducedMotion = window.matchMedia(
+      "(prefers-reduced-motion: reduce)",
+    ).matches;
+    const isLowPower = (navigator.hardwareConcurrency || 4) <= 4;
+    if (reducedMotion) {
+      setCount(0);
+    } else if (isLowPower) {
+      setCount(800);
+    }
+  }, []);
+
+  if (count === 0) return null;
+
+  const sphere = useMemo(() => randomInSphere(new Float32Array(count), 10), [count]);
   const ref = useRef();
-  useFrame((state, delta) => {
+  useFrame((_, delta) => {
     if (ref.current) {
       ref.current.rotation.x -= delta / 30;
       ref.current.rotation.y -= delta / 40;

@@ -42,6 +42,16 @@ export default function Nav() {
   const scrolled = scrollY > 50;
   const [open, setOpen] = useState(false);
 
+  // Close mobile menu on Escape.
+  useEffect(() => {
+    if (!open) return;
+    const handleKey = (e) => {
+      if (e.key === "Escape") setOpen(false);
+    };
+    window.addEventListener("keydown", handleKey);
+    return () => window.removeEventListener("keydown", handleKey);
+  }, [open]);
+
   const go = (id) => {
     scrollToSection(id);
     setOpen(false);
@@ -101,6 +111,9 @@ export default function Nav() {
       <div
         className={`mobile-menu ${open ? "mobile-menu--open" : ""}`}
         aria-hidden={!open}
+        onClick={(e) => {
+          if (e.target === e.currentTarget) setOpen(false);
+        }}
       >
         {/* Close button — positioned absolute, always in DOM */}
         <button
@@ -276,42 +289,59 @@ export function TextReveal({ text, className = "", delay = 0 }) {
 }
 
 /* ─────────────────────────────────────────────────────────────────
-   PARALLAX BACKGROUND
-   Uses a continuous RAF loop instead of a scroll event listener.
-   This keeps the transform in sync with Lenis's smoothed scroll
-   position at 60fps, eliminating the jitter caused by the native
-   scroll event firing at a different cadence than Lenis's RAF tick.
+   PICTURE IMAGE — WebP source with PNG fallback
    ───────────────────────────────────────────────────────────────── */
-export function ParallaxBg({ src, id }) {
-  const rafIdRef = useRef(null);
+export function PictureImage({
+  src,
+  alt,
+  className = "",
+  loading = "lazy",
+  decoding = "async",
+  ...rest
+}) {
+  const webp = src.replace(/\.png$/, ".webp");
+  return (
+    <picture>
+      <source srcSet={webp} type="image/webp" />
+      <img
+        src={src}
+        alt={alt}
+        loading={loading}
+        decoding={decoding}
+        className={className}
+        {...rest}
+      />
+    </picture>
+  );
+}
+
+/* ─────────────────────────────────────────────────────────────────
+   PARALLAX BACKGROUND
+   Driven by the shared scroll context (Lenis-smoothed when available).
+   Reads getBoundingClientRect() only on scroll, not on every frame,
+   and uses a <picture> element so browsers can load WebP with PNG fallback.
+   ───────────────────────────────────────────────────────────────── */
+export function ParallaxBg({ src, id, eager = false }) {
+  const { scrollY } = useScrollState();
+  const ref = useRef(null);
 
   useEffect(() => {
-    const el = document.getElementById(id);
-    if (!el) return;
-
-    const tick = () => {
-      const parent = el.parentElement;
-      if (parent) {
-        const rect = parent.getBoundingClientRect();
-        if (rect.top < window.innerHeight && rect.bottom > 0) {
-          el.style.transform = `translateY(${rect.top * 0.25}px)`;
-        }
-      }
-      rafIdRef.current = requestAnimationFrame(tick);
-    };
-
-    rafIdRef.current = requestAnimationFrame(tick);
-
-    return () => {
-      if (rafIdRef.current) cancelAnimationFrame(rafIdRef.current);
-    };
-  }, [id]);
+    const wrapper = ref.current;
+    if (!wrapper) return;
+    const parent = wrapper.parentElement;
+    if (!parent) return;
+    const rect = parent.getBoundingClientRect();
+    wrapper.style.transform = `translateY(${rect.top * 0.25}px)`;
+  }, [scrollY, id]);
 
   return (
-    <div
-      id={id}
-      className="bg-parallax"
-      style={{ backgroundImage: `url(${src})` }}
-    />
+    <div id={id} ref={ref} className="bg-parallax">
+      <PictureImage
+        src={src}
+        alt=""
+        loading={eager ? "eager" : "lazy"}
+        decoding="async"
+      />
+    </div>
   );
 }

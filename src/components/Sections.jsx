@@ -12,6 +12,7 @@ import {
   GoldRule,
   MoroccanBg,
   ParallaxBg,
+  PictureImage,
   Tag,
   TextReveal,
 } from "./UI";
@@ -25,7 +26,7 @@ import { useScrollState } from "../hooks/useScrollState";
 export function HeroSection() {
   return (
     <section id="hero" className="section section--hero">
-      <ParallaxBg src={MOMENTS.hero} id="hero-bg" />
+      <ParallaxBg src={MOMENTS.hero} id="hero-bg" eager />
       <div className="hero-cinematic-overlay" />
       <MoroccanBg />
 
@@ -161,9 +162,12 @@ export function VisionSection() {
         <div className="vision-grid">
           {/* Image column */}
           <div className="vision-image">
-            <div
+            <PictureImage
+              src={MOMENTS.vision}
+              alt=""
               className="vision-image__bg"
-              style={{ backgroundImage: `url(${MOMENTS.vision})` }}
+              loading="eager"
+              decoding="async"
             />
             <div className="vision-image__overlay" />
             {/* Floating quote on image */}
@@ -453,10 +457,12 @@ export function FooterSection() {
 
   return (
     <footer id="footer" className="footer">
-      <div
+      <PictureImage
+        src={MOMENTS.footer}
+        alt=""
         className="footer__bg"
-        style={{ backgroundImage: `url(${MOMENTS.footer})` }}
-        aria-hidden="true"
+        loading="lazy"
+        decoding="async"
       />
       <div className="footer__overlay" aria-hidden="true" />
       <div className="container">

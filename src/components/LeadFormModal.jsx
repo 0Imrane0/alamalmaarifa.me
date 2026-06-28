@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { motion, AnimatePresence } from "motion/react";
 import { db, collection, addDoc } from "../lib/firebase";
 
@@ -10,8 +10,22 @@ export default function LeadFormModal({ isOpen, onClose }) {
   });
   const [status, setStatus] = useState("idle"); // idle | loading | success | error
 
+  // Close on Escape.
+  useEffect(() => {
+    if (!isOpen) return;
+    const handleKey = (e) => {
+      if (e.key === "Escape") onClose();
+    };
+    window.addEventListener("keydown", handleKey);
+    return () => window.removeEventListener("keydown", handleKey);
+  }, [isOpen, onClose]);
+
   const handleSubmit = async (e) => {
     e.preventDefault();
+    if (!e.target.checkValidity()) {
+      e.target.reportValidity();
+      return;
+    }
     setStatus("loading");
     try {
       await addDoc(collection(db, "leads"), {
@@ -80,7 +94,7 @@ export default function LeadFormModal({ isOpen, onClose }) {
                   inscriptions 2026/2027.
                 </p>
 
-                <form className="lead-form" onSubmit={handleSubmit} noValidate>
+                <form className="lead-form" onSubmit={handleSubmit}>
                   <div className="lead-form-group">
                     <label className="lead-form-label" htmlFor="lf-name">
                       Nom du Parent / Tuteur
@@ -88,6 +102,7 @@ export default function LeadFormModal({ isOpen, onClose }) {
                     <input
                       id="lf-name"
                       required
+                      minLength={2}
                       type="text"
                       className="lead-form-input"
                       value={formData.parentName}
@@ -106,6 +121,9 @@ export default function LeadFormModal({ isOpen, onClose }) {
                       id="lf-phone"
                       required
                       type="tel"
+                      inputMode="tel"
+                      pattern="[+]?[0-9\s]{8,}"
+                      placeholder="+212 6XX XXX XXX"
                       className="lead-form-input"
                       value={formData.phone}
                       onChange={(e) =>

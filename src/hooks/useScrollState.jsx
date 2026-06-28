@@ -23,7 +23,7 @@ function lerpAnchor(a, b, t) {
   };
 }
 
-export function ScrollProvider({ children }) {
+export function ScrollProvider({ children, lenis = null }) {
   const [state, setState] = useState({
     progress: 0,
     sectionIndex: 0,
@@ -34,13 +34,13 @@ export function ScrollProvider({ children }) {
   const rafRef = useRef(null);
 
   useEffect(() => {
-    const update = () => {
-      const sections = SCROLL_SECTIONS.map(({ id }) =>
-        document.getElementById(id),
-      ).filter(Boolean);
-      if (!sections.length) return;
+    const sections = SCROLL_SECTIONS.map(({ id }) =>
+      document.getElementById(id),
+    ).filter(Boolean);
+    if (!sections.length) return;
 
-      const scrollY = window.scrollY;
+    const compute = () => {
+      const scrollY = lenis ? lenis.scroll : window.scrollY;
       const docHeight =
         document.documentElement.scrollHeight - window.innerHeight;
       const progress = docHeight > 0 ? scrollY / docHeight : 0;
@@ -85,12 +85,20 @@ export function ScrollProvider({ children }) {
       });
     };
 
+    if (lenis) {
+      // Sync with Lenis's smoothed scroll for buttery eagle/pillar motion.
+      lenis.on("scroll", compute);
+      compute();
+      return () => lenis.off("scroll", compute);
+    }
+
+    // Fallback for reduced-motion / no Lenis.
     const onScroll = () => {
       if (rafRef.current) cancelAnimationFrame(rafRef.current);
-      rafRef.current = requestAnimationFrame(update);
+      rafRef.current = requestAnimationFrame(compute);
     };
 
-    update();
+    compute();
     window.addEventListener("scroll", onScroll, { passive: true });
     window.addEventListener("resize", onScroll);
 
@@ -99,7 +107,7 @@ export function ScrollProvider({ children }) {
       window.removeEventListener("resize", onScroll);
       if (rafRef.current) cancelAnimationFrame(rafRef.current);
     };
-  }, []);
+  }, [lenis]);
 
   return (
     <ScrollContext.Provider value={state}>{children}</ScrollContext.Provider>

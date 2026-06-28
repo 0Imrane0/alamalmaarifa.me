@@ -23,6 +23,7 @@ import CustomCursor from "./components/CustomCursor";
 
 export default function App() {
   const [isFormOpen, setIsFormOpen] = useState(false);
+  const [lenis, setLenis] = useState(null);
 
   useEffect(() => {
     const prefersReducedMotion = window.matchMedia(
@@ -30,23 +31,24 @@ export default function App() {
     ).matches;
     if (prefersReducedMotion) return;
 
-    const lenis = new Lenis({
+    const instance = new Lenis({
       lerp: 0.08,
       smoothWheel: true,
       wheelMultiplier: 1,
     });
+    setLenis(instance);
 
     function raf(time) {
-      lenis.raf(time);
+      instance.raf(time);
       requestAnimationFrame(raf);
     }
     requestAnimationFrame(raf);
 
-    return () => lenis.destroy();
+    return () => instance.destroy();
   }, []);
 
   return (
-    <ScrollProvider>
+    <ScrollProvider lenis={lenis}>
       <CustomCursor />
       <Preloader />
       <Grain />
@@ -55,7 +57,7 @@ export default function App() {
         <EagleScene />
       </Suspense>
       <Nav />
-      <main className="site-main">
+      <main id="main" className="site-main">
         <HeroSection />
         <VisionSection />
         <OffresSection />

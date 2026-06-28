@@ -56,6 +56,7 @@
     --z-nav: 100;
     --z-modal: 200;
     --z-preloader: 300;
+    --z-scroll-progress: 350;
     --z-cursor: 400;
 }
 
@@ -78,6 +79,33 @@ html.custom-cursor-active * {
 
 html {
     scroll-behavior: smooth;
+}
+
+.skip-link {
+    position: absolute;
+    top: -100%;
+    left: 1rem;
+    z-index: calc(var(--z-nav) + 1);
+    background: var(--gold);
+    color: var(--void);
+    padding: 0.75rem 1rem;
+    border-radius: 6px;
+    font-weight: 600;
+    text-decoration: none;
+    transition: top 0.2s ease;
+}
+
+.skip-link:focus {
+    top: 1rem;
+}
+
+a:focus-visible,
+button:focus-visible,
+input:focus-visible,
+select:focus-visible,
+textarea:focus-visible {
+    outline: 2px solid var(--gold);
+    outline-offset: 3px;
 }
 
 /* Reduced motion: disable smooth scroll, Lenis, and decorative motion. */
@@ -140,6 +168,11 @@ h3 {
     -webkit-background-clip: text;
     -webkit-text-fill-color: transparent;
     background-clip: text;
+}
+
+/* Reserve the shimmer exclusively for the hero title —
+   keeps section headings premium rather than templated. */
+.hero-title .gold-gradient-text {
     animation: goldShimmer 5s linear infinite;
 }
 
@@ -237,10 +270,18 @@ h3 {
     left: -5%;
     right: -5%;
     bottom: -15%;
-    background-size: cover;
-    background-position: center;
     will-change: transform;
     z-index: 0;
+}
+
+.bg-parallax picture,
+.bg-parallax img {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    pointer-events: none;
 }
 
 /* ─────────────────────────────────────────────────────────────────
@@ -267,7 +308,7 @@ h3 {
     height: 2px;
     background: linear-gradient(to right, var(--bronze), var(--gold), #f0d875);
     width: 0%;
-    z-index: var(--z-cursor);
+    z-index: var(--z-scroll-progress);
     box-shadow: 0 0 8px rgba(197, 160, 40, 0.8);
     transition: width 0.1s;
     pointer-events: none;
@@ -961,11 +1002,14 @@ h3 {
     overflow: hidden;
 }
 
-.vision-image__bg {
+.vision-image__bg,
+.vision-image__bg picture,
+.vision-image__bg img {
     position: absolute;
     inset: 0;
-    background-size: cover;
-    background-position: center;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
     transition: transform 0.8s var(--ease-cinematic);
 }
 
@@ -1306,7 +1350,7 @@ h3 {
 
 /* Brand-red pulse for WhatsApp CTA buttons (intentional: school brand color) */
 .cta-wa {
-    animation: redCTAPulse 3s ease-in-out infinite;
+    box-shadow: 0 4px 16px rgba(160, 24, 48, 0.3);
 }
 
 /* ─────────────────────────────────────────────────────────────────
@@ -1400,11 +1444,14 @@ h3 {
     overflow: hidden;
 }
 
-.footer__bg {
+.footer__bg,
+.footer__bg picture,
+.footer__bg img {
     position: absolute;
     inset: 0;
-    background-size: cover;
-    background-position: center;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
     opacity: 0.18;
     filter: grayscale(30%);
 }
@@ -1525,7 +1572,7 @@ h3 {
 
 .footer-bottom {
     font-size: 0.72rem;
-    color: rgba(250, 248, 244, 0.3);
+    color: rgba(250, 248, 244, 0.55);
     text-align: right;
 }
 
@@ -1553,7 +1600,6 @@ h3 {
     font-size: 0.85rem;
     box-shadow: 0 4px 20px rgba(37, 211, 102, 0.4);
     z-index: var(--z-sticky);
-    animation: waPulse 3s ease-in-out infinite;
     transition:
         transform 0.35s var(--ease-cinematic),
         opacity 0.4s var(--ease-cinematic),
@@ -1631,27 +1677,6 @@ h3 {
         opacity: 0.55;
         transform: scale(0.75);
         box-shadow: 0 0 0 4px rgba(197, 160, 40, 0);
-    }
-}
-
-@keyframes waPulse {
-    0%,
-    100% {
-        box-shadow: 0 4px 20px rgba(37, 211, 102, 0.4);
-    }
-    50% {
-        box-shadow: 0 4px 40px rgba(37, 211, 102, 0.7);
-    }
-}
-
-/* Red pulse for brand-colored CTA buttons (school red = primary CTA color) */
-@keyframes redCTAPulse {
-    0%,
-    100% {
-        box-shadow: 0 4px 16px rgba(160, 24, 48, 0.3);
-    }
-    50% {
-        box-shadow: 0 4px 30px rgba(160, 24, 48, 0.6);
     }
 }
 
@@ -1830,6 +1855,10 @@ h3 {
 .lead-form-select {
     appearance: none;
     -webkit-appearance: none;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8' fill='none'%3E%3Cpath d='M1 1.5L6 6.5L11 1.5' stroke='%23C5A028' stroke-width='1.5' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E");
+    background-repeat: no-repeat;
+    background-position: right 1rem center;
+    padding-right: 2.5rem;
 }
 
 .lead-form-error {
@@ -2134,17 +2163,9 @@ h3 {
     .gold-gradient-text {
         animation: none;
     }
-    .btn--hero-primary {
-        animation: none;
-    }
-    .cta-wa {
-        animation: none;
-    }
-    .sticky-wa {
-        animation: none;
-    }
-    .inscriptions-logo {
-        animation: none;
+    .bg-parallax,
+    .vision-image__bg {
+        transform: none !important;
     }
     html {
         scroll-behavior: auto;
