@@ -13,7 +13,6 @@ import {
   onAuthStateChanged,
   signOut,
 } from "firebase/auth";
-import { getAnalytics } from "firebase/analytics";
 
 // Config injected at build time from environment variables.
 // Local dev:        copy .env.example to .env and fill in values.
@@ -32,8 +31,6 @@ const app = initializeApp(firebaseConfig);
 
 export const db = getFirestore(app);
 export const auth = getAuth(app);
-export const analytics =
-  typeof window !== "undefined" ? getAnalytics(app) : null;
 
 export {
   collection,
