@@ -1083,17 +1083,24 @@ h3 {
 .section__overlay--offres {
     position: absolute;
     inset: 0;
-    /* Lighter than campus/transport so the bright school photo reads */
+    /* Much lighter so the bright school photo becomes the star */
     background: linear-gradient(
         to bottom,
-        rgba(8, 14, 28, 0.55) 0%,
-        rgba(8, 14, 28, 0.72) 100%
+        rgba(8, 14, 28, 0.38) 0%,
+        rgba(8, 14, 28, 0.58) 100%
     );
     z-index: 1;
 }
 
 .offres-header {
     margin-bottom: 3rem;
+    text-shadow: 0 2px 16px rgba(8, 14, 28, 0.7);
+}
+
+.section--offres .section__subtitle,
+.section--offres .section__title,
+.section--offres .section__lead {
+    text-shadow: 0 2px 14px rgba(8, 14, 28, 0.6);
 }
 
 .levels-grid {
@@ -1104,12 +1111,14 @@ h3 {
 }
 
 .level-block {
-    background: rgba(27, 58, 107, 0.78);
-    border: 1px solid rgba(197, 160, 40, 0.28);
+    background: rgba(27, 58, 107, 0.72);
+    border: 1px solid rgba(197, 160, 40, 0.32);
     border-radius: 12px;
     padding: clamp(1.5rem, 3vw, 2.5rem);
     backdrop-filter: blur(12px);
-    box-shadow: 0 12px 40px rgba(8, 14, 28, 0.35);
+    box-shadow:
+        0 12px 40px rgba(8, 14, 28, 0.25),
+        inset 0 1px 0 rgba(255, 255, 255, 0.06);
     transition:
         border-color 0.35s var(--ease-cinematic),
         transform 0.35s var(--ease-cinematic),
@@ -1118,8 +1127,8 @@ h3 {
 
 @media (hover: hover) {
     .level-block:hover {
-        background: rgba(27, 58, 107, 0.88);
-        border-color: rgba(197, 160, 40, 0.45);
+        background: rgba(27, 58, 107, 0.82);
+        border-color: rgba(197, 160, 40, 0.48);
         transform: translateY(-4px);
     }
 }
